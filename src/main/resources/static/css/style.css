@@ -1,0 +1,247 @@
+/* ================= GLOBAL ================= */
+* {
+    font-family: 'Urbanist', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    background: radial-gradient(circle at top, #1f2933, #0b0f14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e5e7eb;
+}
+
+/* ================= CONTAINER ================= */
+.to-do-container {
+    width: 100%;
+    max-width: 420px;
+    padding: 26px;
+    border-radius: 22px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.55);
+    animation: scaleIn 0.45s ease;
+}
+
+.glass {
+    backdrop-filter: blur(16px);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+}
+
+/* ================= TITLE ================= */
+.title {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* ================= INPUT ================= */
+.todo-input {
+    border-radius: 14px;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.12);
+    border: none;
+    color: #fff;
+}
+
+.todo-input::placeholder {
+    color: #cbd5e1;
+}
+
+.todo-input:focus {
+    background: rgba(255,255,255,0.18);
+    box-shadow: 0 0 0 2px #6366f1;
+    outline: none;
+}
+
+/* ================= ADD BUTTON ================= */
+.btn-add {
+    min-width: 52px;
+    min-height: 52px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #6366f1, #22d3ee);
+    border: none;
+    color: white;
+    transition: transform .15s cubic-bezier(.2,.8,.2,1),
+                box-shadow .2s ease;
+}
+
+.btn-add:hover {
+    box-shadow: 0 12px 28px rgba(99,102,241,0.5);
+}
+
+.btn-add:active {
+    transform: scale(0.96);
+}
+
+/* ================= EMPTY STATE ================= */
+.empty-state {
+    text-align: center;
+    opacity: 0.7;
+}
+
+.empty-state i {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 6px;
+}
+
+/* ================= TODO LIST ================= */
+.todo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    /* ========== SCROLL ========= */
+    max-height: 360px;                 /* adjust as needed */
+    overflow-y: auto;
+    padding-right: 6px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch; /* mobile momentum scrolling */
+
+    /* optional fade mask for modern look */
+    mask-image: linear-gradient(to bottom, transparent, black 12px, black calc(100% - 12px), transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 12px, black calc(100% - 12px), transparent);
+}
+
+/* Custom scrollbar for desktop */
+.todo-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.todo-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.todo-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(99,102,241,0.8), rgba(34,211,238,0.8));
+    border-radius: 10px;
+}
+
+.todo-list::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(99,102,241,1), rgba(34,211,238,1));
+}
+
+/* Firefox scrollbar */
+.todo-list {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(99,102,241,0.8) transparent;
+}
+
+/* ================= TODO ITEM ================= */
+.todo-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.1);
+    animation: slideUp .35s cubic-bezier(.2,.8,.2,1);
+    transition: transform .15s cubic-bezier(.2,.8,.2,1),
+                background .2s ease;
+}
+
+.todo-item:hover {
+    background: rgba(255,255,255,0.18);
+}
+
+.todo-item:active {
+    transform: scale(0.97);
+}
+
+/* ================= STATUS ICON ================= */
+.status-btn {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: transform 0.15s cubic-bezier(.2,.8,.2,1);
+}
+
+.status-btn:active {
+    transform: scale(0.9);
+}
+
+.check-icon {
+    font-size: 1.4rem;
+    color: #22c55e;
+    animation: pop .25s ease;
+}
+
+.uncheck-icon {
+    font-size: 1.4rem;
+    color: #94a3b8;
+}
+
+/* ================= TODO TEXT ================= */
+.todo-text {
+    flex: 1;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.done {
+    text-decoration: line-through;
+    opacity: 0.55;
+    transform: translateX(2px);
+}
+
+/* ================= DELETE BUTTON ================= */
+.delete-btn {
+    opacity: 0;
+    transform: scale(0.9);
+    color: #ef4444;
+    transition: opacity 0.2s ease,
+                transform 0.2s ease,
+                color 0.2s ease;
+    min-width: 40px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.todo-item:hover .delete-btn {
+    opacity: 1;
+    transform: scale(1);
+}
+
+@media (max-width: 576px) {
+    .delete-btn {
+        opacity: 0.8;
+        transform: scale(1);
+    }
+}
+
+.delete-btn:hover {
+    color: #dc2626;
+}
+
+.delete-btn:active {
+    transform: scale(0.9);
+}
+
+/* ================= MOBILE FIRST ================= */
+@media (max-width: 576px) {
+    .to-do-container {
+        margin: 16px;
+        padding: 22px;
+    }
+
+    .todo-list {
+        max-height: 50vh;
+        padding-right: 4px;
+    }
+}
+
+/* ================= ACCESSIBILITY ================= */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
