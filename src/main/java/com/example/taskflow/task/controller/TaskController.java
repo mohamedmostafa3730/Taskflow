@@ -4,7 +4,6 @@ import com.example.taskflow.exception.TaskNotFoundException;
 import com.example.taskflow.task.entity.Task;
 import com.example.taskflow.task.repository.ITaskRepository;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Test;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +15,7 @@ public class TaskController {
     private final ITaskRepository taskRepository;
 
 
-    @GetMapping({"/", " ", "/home", ""})
+    @GetMapping({"/", "/home"})
     public String showHomePage(Model modle) {
         modle.addAttribute("tasks", taskRepository.findAll());
         return "index";

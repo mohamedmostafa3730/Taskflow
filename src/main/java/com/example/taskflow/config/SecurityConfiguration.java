@@ -8,7 +8,6 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -32,11 +31,13 @@ public class SecurityConfiguration {
             throws Exception {
 
         return http
-                .csrf(AbstractHttpConfigurer::disable)
+                // CSRF must be ENABLED — Thymeleaf th:action auto-adds CSRF tokens
+                .csrf(Customizer.withDefaults())
                 .cors(Customizer.withDefaults())
+                // Sessions must be allowed — RedirectAttributes (flash messages) need them
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
+                                SessionCreationPolicy.IF_REQUIRED
                         )
                 )
                 .authenticationProvider(authenticationProvider)
@@ -45,13 +46,23 @@ public class SecurityConfiguration {
                         UsernamePasswordAuthenticationFilter.class
                 )
                 .authorizeHttpRequests(auth -> auth
+                        // Static resources (CSS, images, etc.) — always public
+                        .requestMatchers("/css/**", "/images/**", "/js/**").permitAll()
+                        // Auth pages — always public
                         .requestMatchers(
                                 "/auth/login",
                                 "/auth/signup",
                                 "/auth/verify",
                                 "/auth/resend"
                         ).permitAll()
+                        // Everything else requires authentication
                         .anyRequest().authenticated()
+                )
+                // If user hits a protected page while not authenticated, redirect to login
+                .exceptionHandling(ex ->
+                        ex.authenticationEntryPoint((request, response, authException) -> {
+                            response.sendRedirect("/auth/login");
+                        })
                 )
                 .build();
     }
