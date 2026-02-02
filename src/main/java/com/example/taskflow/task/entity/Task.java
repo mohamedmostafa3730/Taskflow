@@ -1,5 +1,6 @@
 package com.example.taskflow.task.entity;
 
+import com.example.taskflow.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,6 +11,7 @@ import lombok.*;
 @Data
 @Builder
 public class Task {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,4 +20,9 @@ public class Task {
     private String title;
 
     private boolean status;
+
+    // ── owner ──────────────────────────────────────────────────
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

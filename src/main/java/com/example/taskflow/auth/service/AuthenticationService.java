@@ -1,6 +1,6 @@
 package com.example.taskflow.auth.service;
 
-import com.example.taskflow.auth.Email.EmailService;
+import com.example.taskflow.auth.email.EmailService;
 import com.example.taskflow.auth.dto.AuthResponse;
 import com.example.taskflow.auth.dto.LoginRequest;
 import com.example.taskflow.auth.dto.RegisterRequest;

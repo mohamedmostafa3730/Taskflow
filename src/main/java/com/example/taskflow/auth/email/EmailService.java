@@ -1,4 +1,4 @@
-package com.example.taskflow.auth.Email;
+package com.example.taskflow.auth.email;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

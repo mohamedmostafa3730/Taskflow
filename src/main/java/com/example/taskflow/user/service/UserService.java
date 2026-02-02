@@ -1,12 +1,10 @@
 package com.example.taskflow.user.service;
 
-import com.example.taskflow.auth.Email.EmailService;
 import com.example.taskflow.user.entity.User;
 import com.example.taskflow.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

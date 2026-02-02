@@ -8,6 +8,7 @@ import com.example.taskflow.user.entity.User;
 import com.example.taskflow.user.service.JwtService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,10 +26,9 @@ public class AuthController {
     // ─── LOGIN ─────────────────────────────────────────────────
 
     @GetMapping("/login")
-    public String showLoginPage(Model model, @RequestParam(required = false) String error) {
-        if (error != null) {
-            model.addAttribute("error", "Invalid email or password");
-        }
+    public String showLoginPage(Model model) {
+        // error / success arrive as flash attributes and are already
+        // merged into the model by Spring before this method runs.
         return "login";
     }
 
@@ -38,7 +38,6 @@ public class AuthController {
                         HttpServletResponse response,
                         RedirectAttributes redirectAttributes) {
         try {
-            // Build a LoginRequest and authenticate
             LoginRequest loginRequest = new LoginRequest();
             loginRequest.setEmail(email);
             loginRequest.setPassword(password);
@@ -56,7 +55,7 @@ public class AuthController {
             return "redirect:/";
 
         } catch (Exception e) {
-            redirectAttributes.addAttribute("error", "true");
+            redirectAttributes.addFlashAttribute("error", "Invalid email or password");
             return "redirect:/auth/login";
         }
     }
@@ -65,6 +64,7 @@ public class AuthController {
 
     @GetMapping("/signup")
     public String showSignupPage(Model model) {
+        // flash attributes (error / name / email) are already in the model
         return "signup";
     }
 
@@ -73,9 +73,9 @@ public class AuthController {
                          @RequestParam String email,
                          @RequestParam String password,
                          @RequestParam String confirmPassword,
+                         HttpSession session,
                          RedirectAttributes redirectAttributes) {
         try {
-            // Passwords must match
             if (!password.equals(confirmPassword)) {
                 redirectAttributes.addFlashAttribute("error", "Passwords do not match");
                 redirectAttributes.addFlashAttribute("email", email);
@@ -90,9 +90,13 @@ public class AuthController {
 
             authenticationService.signup(registerRequest);
 
-            // Redirect to verify page, pass email so it knows where the code was sent
+            // Store email in the session so the verify page can read it
+            // even after a browser refresh or direct URL access.
+            session.setAttribute("pendingEmail", email);
+
             redirectAttributes.addFlashAttribute("email", email);
-            redirectAttributes.addFlashAttribute("success", "Account created! Check your email for the verification code.");
+            redirectAttributes.addFlashAttribute("success",
+                    "Account created! Check your email for the verification code.");
             return "redirect:/auth/verify";
 
         } catch (Exception e) {
@@ -106,11 +110,13 @@ public class AuthController {
     // ─── VERIFY ────────────────────────────────────────────────
 
     @GetMapping("/verify")
-    public String showVerifyPage(Model model) {
-        // email and success come via flash attributes after signup redirect
-        // If accessed directly without flash attributes, email will be null
-        if (!model.containsAttribute("email")) {
-            model.addAttribute("email", "");
+    public String showVerifyPage(Model model, HttpSession session) {
+        // Flash attributes (email, success, error) are merged automatically.
+        // Fall back to the session-stored email if flash didn't carry one
+        // (e.g. the user refreshed the page).
+        if (!model.containsAttribute("email") || "".equals(model.getAttribute("email"))) {
+            String sessionEmail = (String) session.getAttribute("pendingEmail");
+            model.addAttribute("email", sessionEmail != null ? sessionEmail : "");
         }
         return "verify";
     }
@@ -118,9 +124,9 @@ public class AuthController {
     @PostMapping("/verify")
     public String verify(@RequestParam String email,
                          @RequestParam("otp") String[] otpDigits,
+                         HttpSession session,
                          RedirectAttributes redirectAttributes) {
         try {
-            // Join the 6 individual digit inputs into one code string
             String code = String.join("", otpDigits);
 
             AuthResponse authResponse = new AuthResponse();
@@ -129,8 +135,11 @@ public class AuthController {
 
             authenticationService.VerifyUser(authResponse);
 
-            // Verified — send to login with success message
-            redirectAttributes.addFlashAttribute("success", "Email verified! You can now sign in.");
+            // Verification complete — clear the pending-email from session
+            session.removeAttribute("pendingEmail");
+
+            redirectAttributes.addFlashAttribute("success",
+                    "Email verified! You can now sign in.");
             return "redirect:/auth/login";
 
         } catch (Exception e) {
@@ -143,22 +152,28 @@ public class AuthController {
     // ─── RESEND ────────────────────────────────────────────────
 
     @GetMapping("/resend")
-    public String showResendPage(Model model) {
-        // If email is already in flash attributes (from verify page), keep it
-        if (!model.containsAttribute("email")) {
-            model.addAttribute("email", "");
+    public String showResendPage(Model model, HttpSession session) {
+        // Same fallback strategy as the verify page
+        if (!model.containsAttribute("email") || "".equals(model.getAttribute("email"))) {
+            String sessionEmail = (String) session.getAttribute("pendingEmail");
+            model.addAttribute("email", sessionEmail != null ? sessionEmail : "");
         }
         return "resend";
     }
 
     @PostMapping("/resend")
     public String resend(@RequestParam String email,
+                         HttpSession session,
                          RedirectAttributes redirectAttributes) {
         try {
             authenticationService.resendVerificationCode(email);
 
+            // Keep the session in sync in case it was empty
+            session.setAttribute("pendingEmail", email);
+
             redirectAttributes.addFlashAttribute("email", email);
-            redirectAttributes.addFlashAttribute("success", "A new verification code has been sent to your email.");
+            redirectAttributes.addFlashAttribute("success",
+                    "A new verification code has been sent to your email.");
             return "redirect:/auth/verify";
 
         } catch (Exception e) {
