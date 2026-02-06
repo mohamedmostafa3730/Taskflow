@@ -2,8 +2,6 @@
 
 <div align="center">
 
-![Taskflow Logo](src/main/resources/static/images/check-list.png)
-
 **A modern, secure task management application built with Spring Boot**
 
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.2-brightgreen.svg)](https://spring.io/projects/spring-boot)
@@ -296,21 +294,6 @@ private String buildEmailHtml(String code) {
 
 ---
 
-## 🧪 Testing
-
-Run unit tests:
-
-```bash
-./mvnw test
-```
-
-Run integration tests:
-
-```bash
-./mvnw verify
-```
-
----
 
 ## 🐛 Troubleshooting
 
@@ -352,21 +335,6 @@ Contributions are welcome! Please follow these steps:
 
 ---
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👨‍💻 Author
-
-**Mohamed Mostafa**
-
-- Email: mohamedmostafa3730@gmail.com
-- GitHub: [@yourusername](https://github.com/yourusername)
-
----
-
 ## 🙏 Acknowledgments
 
 - [Spring Boot](https://spring.io/projects/spring-boot) - Application framework
@@ -377,23 +345,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 📸 Screenshots
-
-### Login Page
-Beautiful glassmorphic login interface with gradient accents.
-
-### Task Dashboard
-Clean, intuitive task management with smooth animations.
-
-### Email Verification
-Secure 6-digit OTP verification with modern email templates.
-
----
-
 <div align="center">
 
 **⭐ Star this repository if you find it helpful!**
 
-Made with ❤️ by Mohamed Mostafa
+Made by Mohamed Mostafa
 
 </div>
